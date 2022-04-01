@@ -6,7 +6,7 @@
 
 int main()
 {
-	std::cout << "Primerita ves con GIT" << std::endl;
+
 }
 
 // Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
