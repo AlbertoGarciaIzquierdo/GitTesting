@@ -3,10 +3,16 @@
 
 #include <iostream>
 #include <string>
+#include "Animal.h"
 
 int main()
 {
 	std::cout << "Primerita ves con GIT" << std::endl;
+
+	std::unique_ptr<Animal> myAnimal (new Animal());
+	myAnimal->SetName("Wartortle");
+
+	std::cout << "Pokemon: " << myAnimal->GetName() << std::endl;
 }
 
 // Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
