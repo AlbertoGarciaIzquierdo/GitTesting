@@ -11,8 +11,19 @@ int main()
 
 	std::unique_ptr<Animal> myAnimal (new Animal());
 	myAnimal->SetName("Wartortle");
+	myAnimal->SetPhysicArmor(5);
+	myAnimal->SetMagicArmor(2);
+	myAnimal->GetAllData();
 
-	std::cout << "Pokemon: " << myAnimal->GetName() << std::endl;
+	std::string comando = "null";
+	while (comando != "exit") {
+		std::cin >> comando;
+
+		if (comando == "addexp")
+			myAnimal->AddExp(1);
+		if (comando == "getdata")
+			myAnimal->GetAllData();
+	}
 }
 
 // Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
