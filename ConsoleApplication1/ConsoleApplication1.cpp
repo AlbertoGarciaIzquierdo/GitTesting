@@ -7,9 +7,7 @@
 
 int main()
 {
-	std::cout << "Primerita ves con GIT" << std::endl;
-
-	std::unique_ptr<Animal> myAnimal (new Animal());
+	std::unique_ptr<Animal> myAnimal(new Animal());
 	myAnimal->SetName("Wartortle");
 	myAnimal->SetPhysicArmor(5);
 	myAnimal->SetMagicArmor(2);
@@ -24,6 +22,11 @@ int main()
 		if (comando == "getdata")
 			myAnimal->GetAllData();
 	}
+
+	std::cout << "Seguro? S/N" << std::endl;
+	std::cin >> comando;
+
+	return 0;
 }
 
 // Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
