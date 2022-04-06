@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <Windows.h>
 #include "Animal.h"
 
 int main()
@@ -17,10 +18,17 @@ int main()
 	while (comando != "exit") {
 		std::cin >> comando;
 
-		if (comando == "addexp")
-			myAnimal->AddExp(1);
-		if (comando == "getdata")
+		if (comando == "addexp") {
+			std::cout << "How much experience to add -> ";
+			int a; std::cin >> a;
+			system("CLS");
+			myAnimal->AddExp(a);
+			std::cout << "Added " << a << " experience to Animal" << std::endl;
+		}
+		if (comando == "getdata") {
+			system("CLS");
 			myAnimal->GetAllData();
+		}
 	}
 
 	std::cout << "Seguro? S/N" << std::endl;

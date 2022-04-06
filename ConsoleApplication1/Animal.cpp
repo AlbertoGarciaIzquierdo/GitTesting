@@ -25,8 +25,10 @@ int Animal::GetMagicArmor() { return magicArmor; }
 
 void Animal::AddExp(const unsigned int& a) { 
 	exp += a;
-	if (exp == pow(2, level)) {
+	while (exp >= pow(2, level)) {
 		level++;
+		health+=5;
+		std::cout << "Your Animal reach level " << level << std::endl;
 	}
 }
 void Animal::SetLevel(const unsigned int& a) { level = a; }
