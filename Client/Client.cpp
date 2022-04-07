@@ -5,6 +5,7 @@
 #include <string>
 #include <winSock2.h>
 #include <WS2tcpip.h>
+#include <thread>
 #include <Windows.h>
 
 #define PORT 8080
@@ -12,40 +13,66 @@
 #pragma comment(lib, "Ws2_32.lib")
 #pragma warning(disable:4996) 
 
-static void Receive(SOCKET s, char* b) {
+static void Receive(SOCKET s) {
     while (true) {
-        int valread = recv(s, b, sizeof(b), 0);
-        printf("%s\n", b);
+        char buffer[1024];
+        int bytes_received = recv(s, buffer, sizeof(buffer), 0);
+        if (bytes_received > 0) {
+            printf("%s\n", buffer);
+        }
     }
 }
 
 static void Send(SOCKET s) {
-    char message[255];
-    while (message != "exit") {
-        std::cin.getline(message, sizeof(message));
-        send(s, message, sizeof(message), 0);
+    std::string message;
+    while (true) {
+        std::getline(std::cin, message);
+        send(s, message.c_str(), sizeof(message), 0);
     }
+}
+
+static void Connect(SOCKET s) {
+    std::cout << "Ingrese IP a conectarse -> ";
+    char direction[INET_ADDRSTRLEN];
+    std::cin >> direction;
+    std::cout << std::endl;
+
+    sockaddr_in service;
+    service.sin_family = AF_INET;
+    service.sin_port = htons(PORT);
+    service.sin_addr.s_addr = inet_addr(direction);
+
+    if (connect(s, (SOCKADDR*)&service, sizeof(service)) < 0) {
+        printf("Couldnt connect to a server");
+        Connect(s);
+    }
+    else { std::cout << "You join " << direction << std::endl; }
 }
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    
+   
+
     // Initialize Winshock
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
     SOCKET ClientSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    sockaddr_in service;
-    service.sin_family = AF_INET;
-    service.sin_port = htons(PORT);
-    InetPton(AF_INET, L"127.0.0.1", &service.sin_addr.s_addr);
+    Connect(ClientSocket);
 
-    if (connect(ClientSocket, (SOCKADDR*)&service, sizeof(service)) < 0) {
-        printf("Couldnt connect to a server");
-    }
-    
-    Send(ClientSocket);
+    std::thread recvThread(Receive, ClientSocket);
+    std::thread sendThread(Send, ClientSocket);
+
+    recvThread.join();
+    sendThread.join();
+
+    /*
+    while (true) {
+        Send(ClientSocket);
+        Receive(ClientSocket);
+    }*/
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

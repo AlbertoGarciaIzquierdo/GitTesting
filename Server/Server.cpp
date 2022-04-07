@@ -6,6 +6,8 @@
 #include <WS2tcpip.h>
 #include <Windows.h>
 #include <string>
+#include <chrono>
+#include <future>
 #include <thread>
 
 #define PORT 8080
@@ -13,26 +15,28 @@
 #pragma warning(disable:4996)
 
 
-static void Receive(SOCKET s, char* b) {
-	int valread = recv(s, b, sizeof(b), 0);
-	printf("%s\n", b);
+static void Receive(SOCKET s) {
+	while (true) {
+		char buffer[1024];
+		int bytes_received = recv(s, buffer, sizeof(buffer), 0);
+		if (bytes_received > 0) {
+			printf("%s\n", buffer);
+		}
+	}
 }
 
 static void Send(SOCKET s) {
-	char message[255];
+	std::string message;
 	while (true) {
-		std::cin.getline(message, sizeof(message));
-		send(s, message, sizeof(message), 0);
+		std::getline(std::cin, message);
+		send(s, message.c_str(), sizeof(message), 0);
 	}
 }
 
 
 int main()
 {
-	char buffer[1024] {0};
-
-
-
+	char buffer[1024];
 
 	// Initialize Winshock
 	WSADATA wsaData;
@@ -62,19 +66,30 @@ int main()
 	}
 	// Create a SOCKET for accepting incoming request
 	SOCKET AcceptSocket;
-	wprintf(L"Waiting for client to connect...\n");
+	wprintf(L"Waiting for client to connect\n");
 
 	// Accept the connections
 	AcceptSocket = accept(ListenSocket, NULL, NULL);
 
-	/*std::thread RecvThread(Receive, AcceptSocket, buffer);
-	std::thread SndThread(Send, AcceptSocket);*/
 
-	while (true) {
-		int valread = recv(AcceptSocket, buffer, sizeof(buffer), 0);
+	std::thread recvThread(Receive, AcceptSocket);
+	std::thread sendThread(Send, AcceptSocket);
+
+	recvThread.join();
+	sendThread.join();
+
+
+
+
+	/*while (true) {
+		std::cout << "Esperando a recibir informacion" << std::endl;
+		int bytes_received = recv(AcceptSocket, buffer, sizeof(buffer), 0);
 		printf("%s\n", buffer);
-		//SndThread.join();
-	}
+		if (bytes_received > 0) {
+			std::cout << "Enviando Informacion" << std::endl;
+			send(AcceptSocket, buffer, sizeof(buffer), 0);
+		}
+	}*/
 }
 
 
