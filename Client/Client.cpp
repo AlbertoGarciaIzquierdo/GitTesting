@@ -43,7 +43,7 @@ static void Connect(SOCKET s) {
     service.sin_addr.s_addr = inet_addr(direction);
 
     if (connect(s, (SOCKADDR*)&service, sizeof(service)) < 0) {
-        printf("Couldnt connect to a server");
+        printf("Couldnt connect to a server\n");
         Connect(s);
     }
     else { std::cout << "You join " << direction << std::endl; }
@@ -67,6 +67,8 @@ int main()
 
     recvThread.join();
     sendThread.join();
+
+    closesocket(ClientSocket);
 
     /*
     while (true) {

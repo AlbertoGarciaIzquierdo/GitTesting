@@ -15,12 +15,18 @@
 #pragma warning(disable:4996)
 
 
-static void Receive(SOCKET s) {
+static void Receive(SOCKET* s) {
 	while (true) {
 		char buffer[1024];
-		int bytes_received = recv(s, buffer, sizeof(buffer), 0);
-		if (bytes_received > 0) {
-			printf("%s\n", buffer);
+		for (int i = 0; i < 2; i++) {
+			if (s[i] != 0) {
+				int bytes_received = recv(s[i], buffer, sizeof(buffer), 0);
+				if (bytes_received > 0) {
+					std::cout << "Data received from block " << i << std::endl;
+					printf("%s\n", buffer);
+					send(s[i], buffer, sizeof(buffer), 0);
+				}
+			}
 		}
 	}
 }
@@ -30,6 +36,15 @@ static void Send(SOCKET s) {
 	while (true) {
 		std::getline(std::cin, message);
 		send(s, message.c_str(), sizeof(message), 0);
+	}
+}
+
+static void Accept(SOCKET listener, SOCKET* ss, sockaddr_in sa) {
+	// Accept the connections
+	for (int i = 0; i < 2; i++) {
+		ss[i] = accept(listener, NULL, NULL);
+		std::cout << "Somebody connected to the server" << std::endl;
+		printf("New connection , socket fd is %d , ip is : %s , port : %d\n", ss[i], inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
 	}
 }
 
@@ -58,27 +73,25 @@ int main()
 		return 1;
 	}
 	// Listen for incoming connections
-	if (listen(ListenSocket, 1) == SOCKET_ERROR) {
+	if (listen(ListenSocket, 2) == SOCKET_ERROR) {
 		wprintf(L"listen failed with error: %ld\n", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
 		return 1;
 	}
 	// Create a SOCKET for accepting incoming request
-	SOCKET AcceptSocket;
+	
+	SOCKET ClientSocket[2];
 	wprintf(L"Waiting for client to connect\n");
 
-	// Accept the connections
-	AcceptSocket = accept(ListenSocket, NULL, NULL);
 
+	std::thread acceptThread(Accept ,ListenSocket, ClientSocket, service);
+	std::thread recvThread(Receive, ClientSocket);
+	//std::thread sendThread(Send, ClientSocket);
 
-	std::thread recvThread(Receive, AcceptSocket);
-	std::thread sendThread(Send, AcceptSocket);
-
+	acceptThread.join();
 	recvThread.join();
-	sendThread.join();
-
-
+	//sendThread.join();
 
 
 	/*while (true) {
