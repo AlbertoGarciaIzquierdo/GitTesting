@@ -11,7 +11,15 @@
 #define PORT 8080
 
 #pragma comment(lib, "Ws2_32.lib")
-#pragma warning(disable:4996) 
+#pragma warning(disable:4996)
+
+struct Usuario {
+    std::string name { "null" };
+    std::string conversation{ "null" };
+
+    Usuario(){}
+    Usuario(std::string n, std::string c) : name(n), conversation(c){}
+};
 
 static void Receive(SOCKET s) {
     while (true) {
@@ -46,7 +54,13 @@ static void Connect(SOCKET s) {
         printf("Couldnt connect to a server\n");
         Connect(s);
     }
-    else { std::cout << "You join " << direction << std::endl; }
+    else {
+        /*Usuario user;
+        std::cin >> user.name;
+        std::cin >> user.conversation;
+        send(s, user.name.c_str(), sizeof(user.name),0);*/
+        std::cout << "You join " << direction << std::endl; 
+    }
 }
 
 int main()

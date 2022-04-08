@@ -63,7 +63,7 @@ int main()
 	// Create sockaddr_in structure
 	sockaddr_in service;
 	service.sin_family = AF_INET;
-	InetPton(AF_INET, L"127.0.0.1", &service.sin_addr.s_addr);
+	InetPton(AF_INET, L"10.1.1.11", &service.sin_addr.s_addr);
 	service.sin_port = htons(PORT);
 
 	// Bind the socket to the sockaddr_in struct
