@@ -15,18 +15,14 @@
 #pragma warning(disable:4996)
 
 
-static void Receive(SOCKET* s) {
+static void Receive(SOCKET* r, SOCKET* s) {
 	while (true) {
 		char buffer[1024];
-		for (int i = 0; i < 2; i++) {
-			if (s[i] != 0) {
-				int bytes_received = recv(s[i], buffer, sizeof(buffer), 0);
-				if (bytes_received > 0) {
-					std::cout << "Data received from block " << i << std::endl;
-					printf("%s\n", buffer);
-					send(s[i], buffer, sizeof(buffer), 0);
-				}
-			}
+		int bytes_received = recv(*r, buffer, sizeof(buffer), 0);
+		if (bytes_received > 0) {
+			std::cout << "Data received from block " << std::endl;
+			printf("%s\n", buffer);
+			send(*s, buffer, sizeof(buffer), 0);
 		}
 	}
 }
@@ -39,12 +35,16 @@ static void Send(SOCKET s) {
 	}
 }
 
-static void Accept(SOCKET listener, SOCKET* ss, sockaddr_in sa) {
+static void Accept(SOCKET listener, SOCKET* ss) {
 	// Accept the connections
 	for (int i = 0; i < 2; i++) {
-		ss[i] = accept(listener, NULL, NULL);
-		std::cout << "Somebody connected to the server" << std::endl;
-		printf("New connection , socket fd is %d , ip is : %s , port : %d\n", ss[i], inet_ntoa(sa.sin_addr), ntohs(sa.sin_port));
+		SOCKET ComingSocket = accept(listener, NULL, NULL);
+
+		ss[i] = ComingSocket;
+		if (ComingSocket != 0) {
+			std::cout << "Somebody connected to the server" << std::endl;
+			//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", ss[i]);
+		}
 	}
 }
 
@@ -52,6 +52,7 @@ static void Accept(SOCKET listener, SOCKET* ss, sockaddr_in sa) {
 int main()
 {
 	char buffer[1024];
+
 
 	// Initialize Winshock
 	WSADATA wsaData;
@@ -79,18 +80,27 @@ int main()
 		WSACleanup();
 		return 1;
 	}
-	// Create a SOCKET for accepting incoming request
-	
+
 	SOCKET ClientSocket[2];
+	sockaddr_in sa{ 0 };
+
+	// Create a SOCKET for accepting incoming request
+
+	
 	wprintf(L"Waiting for client to connect\n");
 
-
-	std::thread acceptThread(Accept ,ListenSocket, ClientSocket, service);
-	std::thread recvThread(Receive, ClientSocket);
-	//std::thread sendThread(Send, ClientSocket);
+	std::thread acceptThread(Accept, ListenSocket, ClientSocket);
+	std::thread recvThread(Receive, &ClientSocket[0], &ClientSocket[1]);
+	std::thread recvThread2(Receive, &ClientSocket[1], &ClientSocket[0]);
 
 	acceptThread.join();
 	recvThread.join();
+	recvThread2.join();
+
+
+
+	//std::thread sendThread(Send, ClientSocket);
+
 	//sendThread.join();
 
 
