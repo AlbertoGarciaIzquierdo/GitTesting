@@ -59,7 +59,7 @@ static void Connect(SOCKET s) {
         std::cin >> user.name;
         std::cin >> user.conversation;
         send(s, user.name.c_str(), sizeof(user.name),0);*/
-        std::cout << "You join " << direction << std::endl; 
+        std::cout << "You join " << direction << std::endl;
     }
 }
 
