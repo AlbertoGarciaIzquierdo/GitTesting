@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "ClientServer.h"
 
@@ -29,36 +30,6 @@ static void Receive(SOCKET* r, SOCKET* s) {
 	}
 }
 
-static void Send(SOCKET s) {
-	std::string message;
-	while (true) {
-		std::getline(std::cin, message);
-		send(s, message.c_str(), sizeof(message), 0);
-	}
-}
-
-/*static void Accept(SOCKET listener, SOCKET* ss, ClientServer* cs) {
-	// Accept the connections
-	unsigned int i = 0;
-	while (true) {
-		if (*ss == 0) {
-			*ss = accept(listener, NULL, NULL); 
-			std::cout << "Somebody connected to the server" << std::endl;
-		}
-	}
-}*/
-
-static void Accept(ClientServer* cliente, SOCKET listen) {
-	int count = 0;
-	while (true) {
-		if (cliente[count].GetStatus() != 1) {
-			cliente[count].Init(listen);
-			count ++;
-		}
-	}
-}
-
-
 int main()
 {
 	char buffer[1024];
@@ -73,7 +44,7 @@ int main()
 	// Create sockaddr_in structure
 	sockaddr_in service;
 	service.sin_family = AF_INET;
-	InetPton(AF_INET, L"10.1.1.11", &service.sin_addr.s_addr);
+	InetPton(AF_INET, L"10.1.1.38", &service.sin_addr.s_addr);
 	service.sin_port = htons(PORT);
 
 	// Bind the socket to the sockaddr_in struct
@@ -91,22 +62,22 @@ int main()
 		return 1;
 	}
 
-	ClientServer MyClientServer[2];
+	std::vector<ClientServer> MyClientServer(1);
 
-	wprintf(L"Waiting for client to connect\n");
+	for (unsigned int i = 0; i < MyClientServer.size(); i++) {
+		MyClientServer[i].SetThread(ListenSocket, MyClientServer[i].GetSocket());
 
-	std::thread AcceptThread;
-
-	MyClientServer[0].Accept(ListenSocket);
-	MyClientServer[1].Accept(ListenSocket);
-	MyClientServer[0].SetThread();
-	MyClientServer[1].SetThread();
-
-	MyClientServer[0].SetContactSocket(MyClientServer[1].GetSocket());
-	MyClientServer[1].SetContactSocket(MyClientServer[0].GetSocket());
+		if (i == MyClientServer.size() - 1) {
+			for (unsigned int j = 0; j < MyClientServer.size(); j++) {
+				MyClientServer[j].Join();
+			}
+		}
+	}
 
 
-	MyClientServer[0].Join();
-	MyClientServer[1].Join();
+
+
+
+
 	
 }

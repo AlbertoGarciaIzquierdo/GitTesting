@@ -7,6 +7,9 @@
 static void CheckThread() {
     std::cout << "I'm running" << std::endl;
 }
+static void ChangeThread() {
+    std::cout << "Now I'm doing different things" << std::endl;
+}
 
 int main()
 {
@@ -17,6 +20,9 @@ int main()
     t[0].join();
 
     std::cout << "T0: " << t[0].get_id() << " T1: " << t[1].get_id() << std::endl;
+    t[0].detach();
+    t[0] = std::thread{ ChangeThread };
+    t[0].join();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

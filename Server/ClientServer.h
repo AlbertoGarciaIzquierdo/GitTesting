@@ -20,7 +20,10 @@ private:
 public:
 	SOCKET ClientSocket;
 	SOCKET ContactSocket;
+	SOCKET Listener;
 	std::thread recvThread;
+
+	//ClientServer(){}
 
 	// GETers SETters USUARIO
 	Usuario GetUser() { return user; }
@@ -35,20 +38,23 @@ public:
 	void SetClientSocket(SOCKET a) { ClientSocket = a; }
 	SOCKET GetContactSocket() { return ContactSocket; }
 	void SetContactSocket(SOCKET a) { ContactSocket = a; }
+	SOCKET GetListener() { return Listener; }
+	void SetListener(SOCKET a) { Listener = a; }
 
 	// GET ADDRESS
 	sockaddr_in GetAddress() { return address; }
 
-
-	void Init(SOCKET listener);
-
-	void Accept(SOCKET listener);
+	void Accept();
 	void SetContact();
 	void Receive(const SOCKET& s);
+	void Send();
 
 	void TestMethod(std::string a) { std::cout << "Soy un test method " << a << std::endl; }
-	void SetThread() {
-		recvThread = std::thread{ &ClientServer::Receive, this, ContactSocket};
+	void SetThread(SOCKET l, SOCKET c) {
+		//recvThread = std::thread{ &ClientServer::Receive, this, ContactSocket};
+		SetListener(l);
+		SetContactSocket(c);
+		recvThread = std::thread{ &ClientServer::Accept, this};
 	}
 	void Join() { recvThread.join(); }
 };

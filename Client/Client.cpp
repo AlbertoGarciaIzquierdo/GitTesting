@@ -47,7 +47,7 @@ static void Connect(SOCKET s) {
 
     sockaddr_in service;
     service.sin_family = AF_INET;
-    service.sin_port = htons(PORT);
+    service.sin_port = htons(8080);
     service.sin_addr.s_addr = inet_addr(direction);
 
     if (connect(s, (SOCKADDR*)&service, sizeof(service)) < 0) {
