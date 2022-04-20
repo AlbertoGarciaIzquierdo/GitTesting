@@ -1,1 +1,2 @@
 # GitTesting
+CLIENT / MULTICLIENT SERVER APP in C++
