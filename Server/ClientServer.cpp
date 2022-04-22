@@ -26,6 +26,8 @@ void ClientServer::Accept()
 		}*/
 
 
+		// CHECK https://stackoverflow.com/questions/2793548/how-to-get-a-null-terminated-string-from-a-c-sharp-string for the fix
+
 		else {
 			char buffer[4096];
 			int bytes_received = recv(ClientSocket, buffer, sizeof(buffer) / sizeof(buffer[0]), 0);
