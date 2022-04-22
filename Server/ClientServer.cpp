@@ -3,6 +3,7 @@
 void ClientServer::Accept()
 {
 	bool connected = false;
+	bool status = true; // FALSE -> Sending; TRUE -> Receiving;
 
 	while (true) {
 		if (!connected) {
@@ -10,18 +11,29 @@ void ClientServer::Accept()
 			ClientSocket = accept(Listener, NULL, NULL);
 			if (ClientSocket != 0) {
 				std::cout << "Somebody connected to the server" << std::endl;
-				//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", ss[i]);
 				connected = true;
 			}
 		}
-		else {
+		/*else {
 			std::string buffer = "ITEM_READ:2022-03-21T17:04:17.487+0100:3014ED5BE056CC0000000054";
 			int bytesSent = send(ClientSocket, buffer.c_str(), buffer.length(), 0);
+			std::cout << "ENVIADO" << std::endl;
 			if (bytesSent == SOCKET_ERROR && WSAGetLastError() == WSAECONNRESET) {
 				std::cout << "Client Disconnected" << std::endl;
 				closesocket(ClientSocket);
 				connected = false;
-			} else if (bytesSent > 0) { Sleep(1000); }
+			}
+		}*/
+
+
+		else {
+			char buffer[4096];
+			int bytes_received = recv(ClientSocket, buffer, sizeof(buffer) / sizeof(buffer[0]), 0);
+			if (bytes_received > 0) {
+				std::cout << "Data received from block " << std::endl;
+				printf("%s\n", buffer);
+				send(ClientSocket, buffer, sizeof(buffer) / sizeof(buffer[0]), 0);
+			}
 		}
 	}
 }
@@ -52,4 +64,4 @@ void ClientServer::Send() {
 		}
 		Sleep(1000);
 		}
-	}
+}

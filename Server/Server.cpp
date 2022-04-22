@@ -65,10 +65,12 @@ int main()
 	std::vector<ClientServer> MyClientServer(1);
 
 	for (unsigned int i = 0; i < MyClientServer.size(); i++) {
+		std::cout << "Setting up Client " << i << std::endl;
 		MyClientServer[i].SetThread(ListenSocket, MyClientServer[i].GetSocket());
 
 		if (i == MyClientServer.size() - 1) {
 			for (unsigned int j = 0; j < MyClientServer.size(); j++) {
+				std::cout << "Setting up Thread " << j << std::endl;
 				MyClientServer[j].Join();
 			}
 		}

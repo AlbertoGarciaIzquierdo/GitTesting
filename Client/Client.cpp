@@ -23,8 +23,8 @@ struct Usuario {
 
 static void Receive(SOCKET s) {
     while (true) {
-        char buffer[1024];
-        int bytes_received = recv(s, buffer, sizeof(buffer), 0);
+        char buffer[4096];
+        int bytes_received = recv(s, buffer, sizeof(buffer)/sizeof(buffer[0]), 0);
         if (bytes_received > 0) {
             printf("%s\n", buffer);
         }
@@ -32,15 +32,15 @@ static void Receive(SOCKET s) {
 }
 
 static void Send(SOCKET s) {
-    std::string message;
+    char message[4096];
     while (true) {
-        std::getline(std::cin, message);
-        send(s, message.c_str(), sizeof(message), 0);
+        std::cin.getline(message, 4096);
+        send(s, message, sizeof(message), 0);
     }
 }
 
 static void Connect(SOCKET s) {
-    std::cout << "Ingrese IP a conectarse -> ";
+    std::cout << "Type Server IP -> ";
     char direction[INET_ADDRSTRLEN];
     std::cin >> direction;
     std::cout << std::endl;
@@ -82,5 +82,6 @@ int main()
     recvThread.join();
     sendThread.join();
 
+    shutdown(ClientSocket, 2);
     closesocket(ClientSocket);
 }
