@@ -2,27 +2,104 @@
 //
 
 #include <iostream>
+#include <chrono>
 #include <thread>
+#include <windows.h>
+#include <ctime>
+#include <math.h>
 
-static void CheckThread() {
-    std::cout << "I'm running" << std::endl;
-}
-static void ChangeThread() {
-    std::cout << "Now I'm doing different things" << std::endl;
+//#define DeltaTime 0.033333333333
+#define DeltaTime 0.01666666666
+
+class Munequito {
+public:
+	Munequito(SHORT a, SHORT b) : pos{ (a),(b) } {
+
+	}
+	Munequito() {
+	}
+
+	float gravity = 1;
+	int jumpForce;
+	struct vector2 {
+		float x, y;
+	};
+	vector2 force{0.0f, 1.5f};
+	COORD direction{ 1,1 };
+	COORD pos{ 0,0 };
+
+	void Setup(int a, int b, int jump) {
+		pos.X = a; pos.Y = b;
+		jumpForce = jump;
+	}
+
+	float t = 0;
+	float y = 0;
+	// y = 5t - t^2
+	void Jump() {
+		if (y >= 0) {
+			y = jumpForce * t - std::pow(t, 2);
+			t += DeltaTime * 4;
+			pos.Y = 28 - y;
+		}
+		if (pos.X > 114) { direction.X = -1; } if (pos.X < 2) { direction.X = 1; }
+		pos.X += 1 * direction.X;
+		if (y < 0) { t = 0; y = 0; }
+	}
+
+	void Physics() {
+		if (pos.Y < 28)
+			pos.Y += gravity;
+		if (force.y > 0)
+			this->force.y -= gravity * DeltaTime;
+		if (force.y > gravity) {
+			pos.Y -= force.y;
+		}
+	}
+
+	void Movement() {
+		if (pos.X > 114) { direction.X = -1; } if (pos.X < 2) { direction.X = 1; }
+		if (pos.Y > 28) { direction.Y = -1; } if (pos.Y < 2) { direction.Y = 1; }
+		pos.X += 1 * direction.X; pos.Y += 1 * direction.Y;
+	}
+
+	void Draw(HANDLE& console) {
+		SetConsoleCursorPosition(console, pos);
+		std::cout << "O";
+	}
+};
+
+void ShowConsoleCursor(bool showFlag)
+{
+	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	CONSOLE_CURSOR_INFO     cursorInfo;
+
+	GetConsoleCursorInfo(out, &cursorInfo);
+	cursorInfo.bVisible = showFlag; // set the cursor visibility
+	SetConsoleCursorInfo(out, &cursorInfo);
 }
 
 int main()
 {
-    std::cout << "Hello World!\n";
-    std::thread t[5];
-    t[0] = std::thread{ CheckThread };
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	ShowConsoleCursor(false);
+	
 
-    t[0].join();
+	Munequito munequitos[7];
+	srand(time(NULL));
 
-    std::cout << "T0: " << t[0].get_id() << " T1: " << t[1].get_id() << std::endl;
-    t[0].detach();
-    t[0] = std::thread{ ChangeThread };
-    t[0].join();
+	for (int i = 0; i < sizeof(munequitos) / sizeof(munequitos[0]); i++) {
+		munequitos[i].Setup(rand() % 115, 28, rand() % 6 + 5);
+	}
+	while (true) {
+		for (int i = 0; i < sizeof(munequitos) / sizeof(munequitos[0]); i++) {
+			munequitos[i].Jump();
+			munequitos[i].Draw(hConsole);
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 60));
+		system("CLS");
+	}
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

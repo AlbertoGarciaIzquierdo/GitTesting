@@ -1,0 +1,8 @@
+﻿  Test3.cpp
+C:\Users\AGarcia\source\repos\ConsoleApplication1\Test3\Test3.cpp(11,7): warning C4101: 'sum': unreferenced local variable
+  Generating code
+  0 of 17 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Test3.vcxproj -> C:\Users\AGarcia\source\repos\ConsoleApplication1\x64\Release\Test3.exe
