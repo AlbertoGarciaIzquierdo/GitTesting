@@ -1,5 +1,6 @@
 // Test3.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
+// http://www.directxtutorial.com/Lesson.aspx?lessonid=11-4-5
 
 #ifndef UNICODE
 #define UNICODE
